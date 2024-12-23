@@ -1621,7 +1621,7 @@ impl dispatch::AdapterInterface for WebAdapter {
         )
         .expect("Setting Object properties should never fail.");
 
-        let required_features = FEATURES_MAPPING
+        let mut required_features = FEATURES_MAPPING
             .iter()
             .copied()
             .flat_map(|(flag, value)| {
@@ -1632,6 +1632,9 @@ impl dispatch::AdapterInterface for WebAdapter {
                 }
             })
             .collect::<js_sys::Array>();
+
+        required_features.push(&JsValue::from("subgroups"));
+
         mapped_desc.set_required_features(&required_features);
 
         if let Some(label) = desc.label {
