@@ -146,7 +146,7 @@ impl Instance {
 
             if is_only_available_backend || (requested_webgpu && support_webgpu) {
                 return Self {
-                    inner: crate::backend::ContextWebGpu::new(_instance_desc).into(),
+                    inner: crate::backend::ContextWebGpu::new(&_instance_desc).into(),
                 };
             }
         }
