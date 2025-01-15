@@ -198,7 +198,7 @@ pub async fn is_browser_webgpu_supported() -> bool {
 /// If no backend feature for the active target platform is enabled,
 /// this method will panic, see [`Instance::enabled_backend_features()`].
 pub async fn new_instance_with_webgpu_detection(
-    instance_desc: &wgt::InstanceDescriptor,
+    instance_desc: wgt::InstanceDescriptor,
 ) -> crate::Instance {
     let mut instance_desc = instance_desc.clone();
     if instance_desc
@@ -209,5 +209,5 @@ pub async fn new_instance_with_webgpu_detection(
         instance_desc.backends.remove(wgt::Backends::BROWSER_WEBGPU);
     }
 
-    crate::Instance::new(instance_desc.clone())
+    crate::Instance::new(instance_desc)
 }
