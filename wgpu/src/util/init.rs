@@ -209,5 +209,5 @@ pub async fn new_instance_with_webgpu_detection(
         instance_desc.backends.remove(wgt::Backends::BROWSER_WEBGPU);
     }
 
-    crate::Instance::new(&instance_desc)
+    crate::Instance::new(instance_desc.clone())
 }

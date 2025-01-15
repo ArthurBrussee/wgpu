@@ -48,7 +48,7 @@ impl Default for Instance {
     /// If no backend feature for the active target platform is enabled,
     /// this method will panic, see [`Instance::enabled_backend_features()`].
     fn default() -> Self {
-        Self::new(&InstanceDescriptor::default())
+        Self::new(InstanceDescriptor::default())
     }
 }
 
@@ -128,7 +128,7 @@ impl Instance {
     /// If no backend feature for the active target platform is enabled,
     /// this method will panic, see [`Instance::enabled_backend_features()`].
     #[allow(clippy::allow_attributes, unreachable_code)]
-    pub fn new(_instance_desc: &InstanceDescriptor) -> Self {
+    pub fn new(_instance_desc: InstanceDescriptor) -> Self {
         if Self::enabled_backend_features().is_empty() {
             panic!(
                 "No wgpu backend feature that is implemented for the target platform was enabled. \
@@ -154,7 +154,7 @@ impl Instance {
         #[cfg(wgpu_core)]
         {
             return Self {
-                inner: crate::backend::ContextWgpuCore::new(_instance_desc).into(),
+                inner: crate::backend::ContextWgpuCore::new(&_instance_desc).into(),
             };
         }
 
