@@ -27,6 +27,14 @@ impl Queue {
         self.inner.as_custom()
     }
 
+    /// Wrap an externally-supplied [`crate::backend::webgpu::WebQueue`].
+    #[cfg(webgpu)]
+    pub fn from_webgpu(queue: crate::backend::webgpu::WebQueue) -> Self {
+        Self {
+            inner: dispatch::DispatchQueue::from(queue),
+        }
+    }
+
     #[cfg(custom)]
     /// Creates Queue from custom implementation
     pub fn from_custom<T: custom::QueueInterface>(queue: T) -> Self {

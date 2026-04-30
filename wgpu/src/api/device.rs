@@ -49,6 +49,16 @@ impl Device {
         }
     }
 
+    /// Wrap an externally-supplied [`crate::backend::webgpu::WebDevice`].
+    /// Lets a host that already owns a JS `GPUDevice` hand it to `wgpu`
+    /// instead of going through `Adapter::request_device`.
+    #[cfg(webgpu)]
+    pub fn from_webgpu(device: crate::backend::webgpu::WebDevice) -> Self {
+        Self {
+            inner: dispatch::DispatchDevice::from(device),
+        }
+    }
+
     /// Constructs a stub device for testing using [`Backend::Noop`].
     ///
     /// This is a convenience function which avoids the configuration, `async`, and fallibility

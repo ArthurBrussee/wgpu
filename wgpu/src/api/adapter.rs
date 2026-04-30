@@ -150,6 +150,14 @@ impl Adapter {
         }
     }
 
+    /// Wrap an externally-supplied [`crate::backend::webgpu::WebAdapter`].
+    #[cfg(webgpu)]
+    pub fn from_webgpu(adapter: crate::backend::webgpu::WebAdapter) -> Self {
+        Self {
+            inner: dispatch::DispatchAdapter::from(adapter),
+        }
+    }
+
     /// Returns whether this adapter may present to the passed surface.
     pub fn is_surface_supported(&self, surface: &Surface<'_>) -> bool {
         self.inner.is_surface_supported(&surface.inner)
