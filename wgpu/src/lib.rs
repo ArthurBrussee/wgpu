@@ -271,6 +271,14 @@ pub mod util;
 #[cfg(custom)]
 pub use backend::custom;
 
+/// Backend types for the WebGPU (browser) backend. Exposed so JS hosts can
+/// hand `wgpu` a pre-built JS `GPUDevice` / `GPUAdapter` / `GPUQueue` and
+/// pull out the underlying `web_sys::GpuBuffer` from a `wgpu::Buffer`.
+#[cfg(webgpu)]
+pub mod webgpu_backend {
+    pub use crate::backend::webgpu::{WebAdapter, WebBuffer, WebDevice, WebQueue};
+}
+
 pub use api::*;
 pub use wgt::{
     AdapterInfo, AddressMode, AllocatorReport, AstcBlock, AstcChannel, Backend, BackendOptions,
