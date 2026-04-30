@@ -1203,6 +1203,7 @@ pub fn get_browser_gpu_property(
     Ok(DefinedNonNullJsValue::new(maybe_undefined_gpu))
 }
 
+/// WebGPU-backend [`crate::Adapter`] implementation. Wraps a JS `GPUAdapter`.
 #[derive(Debug, Clone)]
 pub struct WebAdapter {
     pub(crate) inner: webgpu_sys::GpuAdapter,
@@ -1210,6 +1211,18 @@ pub struct WebAdapter {
     ident: crate::cmp::Identifier,
 }
 
+impl WebAdapter {
+    /// Wrap an externally-supplied JS `GPUAdapter`. The returned [`WebAdapter`]
+    /// can be turned into a [`crate::Adapter`] via [`crate::Adapter::from_webgpu`].
+    pub fn from_handle(handle: wasm_bindgen::JsValue) -> Self {
+        Self {
+            inner: webgpu_sys::GpuAdapter::from(handle),
+            ident: crate::cmp::Identifier::create(),
+        }
+    }
+}
+
+/// WebGPU-backend [`crate::Device`] implementation. Wraps a JS `GPUDevice`.
 #[derive(Debug, Clone)]
 pub struct WebDevice {
     pub(crate) inner: webgpu_sys::GpuDevice,
@@ -1219,11 +1232,35 @@ pub struct WebDevice {
     error_scope_count: Rc<Cell<u32>>,
 }
 
+impl WebDevice {
+    /// Wrap an externally-supplied JS `GPUDevice`. The returned [`WebDevice`]
+    /// can be turned into a [`crate::Device`] via [`crate::Device::from_webgpu`].
+    pub fn from_handle(handle: wasm_bindgen::JsValue) -> Self {
+        Self {
+            inner: webgpu_sys::GpuDevice::from(handle),
+            ident: crate::cmp::Identifier::create(),
+            error_scope_count: Rc::new(Cell::new(0)),
+        }
+    }
+}
+
+/// WebGPU-backend [`crate::Queue`] implementation. Wraps a JS `GPUQueue`.
 #[derive(Debug, Clone)]
 pub struct WebQueue {
     pub(crate) inner: webgpu_sys::GpuQueue,
     /// Unique identifier for this Queue.
     ident: crate::cmp::Identifier,
+}
+
+impl WebQueue {
+    /// Wrap an externally-supplied JS `GPUQueue`. The returned [`WebQueue`]
+    /// can be turned into a [`crate::Queue`] via [`crate::Queue::from_webgpu`].
+    pub fn from_handle(handle: wasm_bindgen::JsValue) -> Self {
+        Self {
+            inner: webgpu_sys::GpuQueue::from(handle),
+            ident: crate::cmp::Identifier::create(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -1268,6 +1305,7 @@ struct WebBufferMapState {
 /// The WebGPU specification forbids calling `getMappedRange` on a `webgpu_sys::GpuBuffer` more than
 /// once, so this struct stores the initial mapped range and re-uses it, allowing for multiple `get_mapped_range`
 /// calls on the Rust-side.
+/// WebGPU-backend [`crate::Buffer`] implementation. Wraps a JS `GPUBuffer`.
 #[derive(Debug, Clone)]
 pub struct WebBuffer {
     /// The associated GPU buffer.
@@ -1279,6 +1317,12 @@ pub struct WebBuffer {
 }
 
 impl WebBuffer {
+    /// Returns the underlying `GPUBuffer` JS object as a [`wasm_bindgen::JsValue`].
+    /// JS hosts can `JsCast::dyn_into::<web_sys::GpuBuffer>()` it.
+    pub fn raw_js(&self) -> wasm_bindgen::JsValue {
+        self.inner.clone().into()
+    }
+
     /// Creates a new web buffer for the given Javascript object and description.
     fn new(inner: webgpu_sys::GpuBuffer, desc: &crate::BufferDescriptor<'_>) -> Self {
         Self {

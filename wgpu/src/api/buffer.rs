@@ -455,6 +455,13 @@ impl Buffer {
     pub fn as_custom<T: custom::BufferInterface>(&self) -> Option<&T> {
         self.inner.as_custom()
     }
+
+    /// If this buffer is backed by the WebGPU (browser) backend, returns the
+    /// backend-specific [`crate::webgpu_backend::WebBuffer`].
+    #[cfg(webgpu)]
+    pub fn as_webgpu(&self) -> Option<&crate::backend::webgpu::WebBuffer> {
+        self.inner.as_webgpu_opt()
+    }
 }
 
 /// A slice of a [`Buffer`], to be mapped, used for vertex or index data, or the like.
