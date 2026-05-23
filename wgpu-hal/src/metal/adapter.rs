@@ -44,20 +44,20 @@ fn device_class_responds_to(device: &ProtocolObject<dyn MTLDevice>, sel: Sel) ->
 /// [new command buffer]: https://developer.apple.com/documentation/metal/mtlcommandqueue/makecommandbuffer()?language=objc
 pub(super) const MAX_COMMAND_BUFFERS: usize = 4096;
 
-// Metal has a single buffer limit that we must split across 3 WebGPU limits:
-// The Metal limit is: 31 "Maximum number of entries in the buffer argument table, per graphics or kernel function".
-// We must split it across:
-//  - maxStorageBuffersPerShaderStage; must be at least 8
-//  - maxUniformBuffersPerShaderStage; must be at least 12
-//  - maxVertexBuffers; must be at least 8
-// We require 2 additional internal buffers:
-//  - one for immediate data
-//  - one for sizes of other buffers
-// We use the last buffer for an acceleration structure.
-const MAX_STORAGE_BUFFERS_PER_SHADER_STAGE: u32 = 8;
-const MAX_UNIFORM_BUFFERS_PER_SHADER_STAGE: u32 = 12;
+// Metal has a single buffer-argument table of 31 entries per graphics or kernel
+// function. Upstream's #9118 split it conservatively across the WebGPU limits
+// (storage=8, uniform=12, vertex=8, accel=1). v29.0.1 reverted that split for
+// native because it broke real apps that need more than 8 storage buffers per
+// stage. Trunk hasn't taken the revert yet (tracked in #9287 as a future
+// "relaxed-on-native, strict-on-WebGPU opt-in"), so we report the relaxed
+// values here. Slot allocation is dynamic — `device.rs` bumps a per-stage
+// counter, so over-reporting only burns the spec's validation cap, not actual
+// Metal slots. Vertex buffers still get a dedicated tail range, so
+// `MAX_VERTEX_BUFFERS` / `VERTEX_BUFFER_SLOT_START` stay as upstream.
+const MAX_STORAGE_BUFFERS_PER_SHADER_STAGE: u32 = 31;
+const MAX_UNIFORM_BUFFERS_PER_SHADER_STAGE: u32 = 31;
 const MAX_VERTEX_BUFFERS: u32 = 8;
-const MAX_ACCELERATION_STRUCTURES_PER_SHADER_STAGE: u32 = 1;
+const MAX_ACCELERATION_STRUCTURES_PER_SHADER_STAGE: u32 = 31;
 // Use the end of the range for vertex buffers.
 pub const VERTEX_BUFFER_SLOT_START: u32 = 31 - 8;
 
